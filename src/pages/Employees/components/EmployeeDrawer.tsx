@@ -3,8 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
-  X, User, Mail, Phone, Building, Hash,
-  DollarSign, Calendar, MapPin, ChevronDown
+  X, User, Mail, Phone, Hash,
+  DollarSign, Calendar, MapPin
 } from 'lucide-react'
 import { employeeSchema, EmployeeFormData } from '@/modules/employees/employeeSchema'
 import { Button } from '@/components/ui/button'

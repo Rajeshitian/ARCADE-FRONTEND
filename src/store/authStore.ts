@@ -1,12 +1,14 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
-import type { AuthUser, SecurityRole } from '@/constants/types'
+import type { SecurityRole } from '@/constants/types'
 
 export interface User {
   id: string
   username: string
   email: string
   roles: SecurityRole[]
+  name?: string
+  department?: string
 }
 
 interface AuthState {

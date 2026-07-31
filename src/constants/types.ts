@@ -77,6 +77,20 @@ export interface EmployeePage {
   pageInfo: PageInfo
 }
 
+export type ActivityType = 'HIRE' | 'PROMOTION' | 'REVIEW' | 'UPDATE' | 'NOTE'
+
+export interface ActivityItem {
+  id: string
+  type: ActivityType
+  message: string
+  timestamp: string
+  user: {
+    id: string
+    name: string
+    avatar?: string
+  }
+}
+
 // ─── Auth ─────────────────────────────────────────────────────────────────────
 
 export interface AuthUser {

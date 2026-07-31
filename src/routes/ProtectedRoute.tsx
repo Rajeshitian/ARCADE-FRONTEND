@@ -1,8 +1,9 @@
 import { Navigate, Outlet } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
+import type { SecurityRole } from '@/constants/types'
 
 interface ProtectedRouteProps {
-  requiredRole?: 'ADMIN' | 'MANAGER' | 'VIEWER'
+  requiredRole?: SecurityRole
 }
 
 export function ProtectedRoute({ requiredRole }: ProtectedRouteProps) {
@@ -12,7 +13,7 @@ export function ProtectedRoute({ requiredRole }: ProtectedRouteProps) {
     return <Navigate to="/login" replace />
   }
 
-  if (requiredRole && user?.role !== requiredRole && user?.role !== 'ADMIN') {
+  if (requiredRole && !user?.roles?.includes(requiredRole) && !user?.roles?.includes('ADMIN')) {
     return <Navigate to="/" replace />
   }
 

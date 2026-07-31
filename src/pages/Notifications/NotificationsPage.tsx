@@ -2,9 +2,8 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Bell, UserPlus, TrendingUp, LogOut, Edit,
-  Star, FileText, CheckCheck, Trash2, Filter, RefreshCw
+  Star, FileText, CheckCheck, Trash2
 } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Avatar } from '@/components/ui/avatar'
@@ -25,7 +24,7 @@ const typeConfig: Record<string, { icon: React.ComponentType<{ className?: strin
 }
 
 // Extend mock data to have more notifications
-const MOCK_NOTIFICATIONS = [
+const MOCK_NOTIFICATIONS: ActivityItem[] = [
   ...MOCK_DASHBOARD_STATS.recentActivity,
   {
     id: '6',

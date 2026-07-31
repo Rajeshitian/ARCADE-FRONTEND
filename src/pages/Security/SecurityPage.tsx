@@ -1,18 +1,16 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import {
-  Shield, Lock, Key, Users, AlertTriangle,
+  Lock, Key, AlertTriangle,
   CheckCircle2, Eye, EyeOff, RefreshCw,
-  Smartphone, Globe, Clock, ChevronRight,
-  ShieldCheck, ShieldAlert, Activity
+  Smartphone, Globe, Clock,
+  ShieldCheck, Activity
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Avatar } from '@/components/ui/avatar'
 import { staggerContainer, staggerItem } from '@/animations/variants'
 import { cn, formatRelativeTime } from '@/utils'
-import { useAuthStore } from '@/store/authStore'
 
 const MOCK_SESSIONS = [
   { id: '1', device: 'Chrome on Windows', location: 'Mumbai, India', ip: '192.168.1.1', lastActive: new Date(Date.now() - 1000 * 60 * 2).toISOString(), current: true },
@@ -43,7 +41,6 @@ const severityConfig = {
 }
 
 export function SecurityPage() {
-  const { user } = useAuthStore()
   const [sessions, setSessions] = useState(MOCK_SESSIONS)
   const [showToken, setShowToken] = useState(false)
 

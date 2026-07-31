@@ -22,7 +22,7 @@ import {
   MOCK_EMPLOYEES, MOCK_DEPARTMENTS,
   MOCK_PROJECTS, MOCK_ROLES,
 } from '@/constants/mockData'
-import type { Employee, EmployeeFilterInput, SortInput, SortDirection, Department } from '@/constants/types'
+import type { Employee, EmployeeFilterInput, SortInput, SortDirection, Department, Project, Role } from '@/constants/types'
 import type { EmployeeFormData } from '@/modules/employees/employeeSchema'
 import { generateId } from '@/utils'
 
@@ -58,7 +58,7 @@ export function EmployeesPage() {
   const sort: SortInput = { field: sortField, direction: sortDir }
 
   const { data: empData,  loading: empLoading  } = useAllEmployees(page, PAGE_SIZE, filter, sort)
-  const { data: deptData, loading: deptLoading } = useAllDepartments()
+  const { data: deptData } = useAllDepartments()
   const { data: projData                       } = useAllProjects()
   const { data: roleData                       } = useAllRoles()
 
@@ -167,8 +167,8 @@ export function EmployeesPage() {
               id: generateId(),
               ...data.address,
             },
-            projects: projects.filter((p) => data.projectIds?.includes(p.id)),
-            roles:    roles.filter((r) => data.roleIds?.includes(r.id)),
+            projects: projects.filter((p: Project) => data.projectIds?.includes(p.id)),
+            roles:    roles.filter((r: Role) => data.roleIds?.includes(r.id)),
           }
           // In demo mode we just show toast (can't mutate MOCK_EMPLOYEES const easily)
           success('Employee added (demo)', `${newEmp.fullName} added locally.`)

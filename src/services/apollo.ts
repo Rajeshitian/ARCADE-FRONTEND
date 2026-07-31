@@ -84,7 +84,7 @@ const cache = new InMemoryCache({
       fields: {
         employees: {
           keyArgs: ['filter', 'sort'],
-          merge(existing, incoming) {
+          merge(_existing, incoming) {
             return incoming
           },
         },

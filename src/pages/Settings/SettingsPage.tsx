@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useAuthStore } from '@/store/authStore'
 import { useUIStore } from '@/store/uiStore'
-import { staggerContainer, staggerItem } from '@/animations/variants'
 import { cn } from '@/utils'
 
 const tabs = [
@@ -73,11 +72,11 @@ export function SettingsPage() {
               <div className="flex items-center gap-4">
                 <div className="h-16 w-16 rounded-xl bg-gradient-to-br from-blue-500/30 to-violet-500/30 border border-white/10 flex items-center justify-center">
                   <span className="text-xl font-bold text-white/80">
-                    {user?.name?.charAt(0) ?? 'A'}
+                    {(user?.name ?? user?.username)?.charAt(0)?.toUpperCase() ?? 'A'}
                   </span>
                 </div>
                 <div>
-                  <p className="font-medium text-foreground">{user?.name}</p>
+                  <p className="font-medium text-foreground">{user?.name ?? user?.username}</p>
                   <p className="text-sm text-muted-foreground">{user?.email}</p>
                   <Button variant="outline" size="sm" className="mt-2 text-xs">Change Avatar</Button>
                 </div>
@@ -86,7 +85,7 @@ export function SettingsPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Full Name</label>
-                  <Input defaultValue={user?.name ?? ''} />
+                  <Input defaultValue={user?.name ?? user?.username ?? ''} />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Email</label>
@@ -98,7 +97,7 @@ export function SettingsPage() {
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Role</label>
-                  <Input defaultValue={user?.role ?? 'ADMIN'} disabled />
+                  <Input defaultValue={user?.roles?.[0] ?? 'ADMIN'} disabled />
                 </div>
               </div>
 
