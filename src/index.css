@@ -1,0 +1,170 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 224 71% 4%;
+    --card: 0 0% 100%;
+    --card-foreground: 224 71% 4%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 71% 4%;
+    --primary: 220 75% 54%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 220 9% 46%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 55%;
+    --accent: 220 14% 96%;
+    --accent-foreground: 220 9% 15%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 220 75% 54%;
+    --radius: 0.625rem;
+
+    --surface-50: 0 0% 98%;
+    --surface-100: 220 14% 96%;
+    --surface-200: 220 13% 91%;
+    --surface-300: 220 9% 84%;
+
+    --sidebar-width: 260px;
+    --sidebar-collapsed: 64px;
+    --header-height: 60px;
+  }
+
+  .dark {
+    --background: 224 71% 4%;
+    --foreground: 213 31% 91%;
+    --card: 224 71% 6%;
+    --card-foreground: 213 31% 91%;
+    --popover: 224 71% 5%;
+    --popover-foreground: 215 20% 65%;
+    --primary: 220 75% 60%;
+    --primary-foreground: 220 75% 98%;
+    --secondary: 222 47% 11%;
+    --secondary-foreground: 215 20% 65%;
+    --muted: 222 47% 10%;
+    --muted-foreground: 215 20% 55%;
+    --accent: 222 47% 12%;
+    --accent-foreground: 213 31% 91%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 216 34% 12%;
+    --input: 216 34% 12%;
+    --ring: 220 75% 60%;
+
+    --surface-50: 224 71% 5%;
+    --surface-100: 222 47% 8%;
+    --surface-200: 222 47% 11%;
+    --surface-300: 216 34% 16%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Outfit', system-ui, sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply backdrop-blur-xl bg-white/5 border border-white/10;
+  }
+
+  .glass-light {
+    @apply backdrop-blur-xl bg-white/80 border border-white/40;
+  }
+
+  .glass-dark {
+    @apply backdrop-blur-xl bg-black/40 border border-white/10;
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-blue-400 via-violet-400 to-indigo-400 bg-clip-text text-transparent;
+  }
+
+  .gradient-brand {
+    background: linear-gradient(135deg, hsl(220, 75%, 54%) 0%, hsl(260, 75%, 60%) 100%);
+  }
+
+  .card-premium {
+    @apply relative overflow-hidden rounded-xl border border-white/[0.06] bg-gradient-to-b from-white/[0.04] to-transparent;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.05), 0 4px 8px rgba(0,0,0,0.1), 0 0 0 1px rgba(255,255,255,0.04);
+  }
+
+  .card-hover {
+    @apply transition-all duration-200 hover:border-white/[0.12] hover:shadow-lg;
+  }
+
+  .text-gradient-blue {
+    background: linear-gradient(135deg, #60a5fa, #818cf8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-gradient-green {
+    background: linear-gradient(135deg, #34d399, #6ee7b7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-gradient-orange {
+    background: linear-gradient(135deg, #fb923c, #f59e0b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-gradient-pink {
+    background: linear-gradient(135deg, #f472b6, #c084fc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.1) transparent;
+  }
+
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  .animate-in {
+    animation: fade-in 0.3s ease-out;
+  }
+
+  /* Shimmer skeleton */
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      rgba(255,255,255,0.03) 0%,
+      rgba(255,255,255,0.08) 50%,
+      rgba(255,255,255,0.03) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s linear infinite;
+  }
+}
+
+/* Custom scrollbar for elements with overflow */
+.custom-scroll::-webkit-scrollbar { width: 4px; }
+.custom-scroll::-webkit-scrollbar-track { background: transparent; }
+.custom-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
+.custom-scroll::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.15); }
