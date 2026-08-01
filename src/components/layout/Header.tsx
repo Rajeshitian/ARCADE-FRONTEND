@@ -108,9 +108,12 @@ export function Header() {
 
         {/* Notifications */}
         <Button
+          type="button"
           variant="ghost"
           size="icon-sm"
           className="relative text-muted-foreground hover:text-foreground"
+          onClick={() => navigate('/notifications')}
+          aria-label="Open notifications"
         >
           <Bell className="h-4 w-4" />
           <span className="absolute top-1 right-1 h-1.5 w-1.5 bg-blue-400 rounded-full" />
