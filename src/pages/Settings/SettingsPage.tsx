@@ -1,8 +1,10 @@
+import { useRef } from 'react'
 import { motion } from 'framer-motion'
 import { User, Bell, Shield, Palette, Database, Key, Save } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Avatar } from '@/components/ui/avatar'
 import { useAuthStore } from '@/store/authStore'
 import { useUIStore } from '@/store/uiStore'
 import { useAllDepartments } from '@/hooks/useEmployees'
@@ -22,10 +24,25 @@ if (!API_URL) throw new Error('VITE_API_URL must be configured in production')
 const GRAPHQL_URL = `${API_URL}/graphql`
 
 export function SettingsPage() {
-  const { user } = useAuthStore()
+  const { user, setUser } = useAuthStore()
   const { theme, toggleTheme } = useUIStore()
   const { error: connectionError, loading: connectionLoading } = useAllDepartments()
   const connectionOk = !connectionLoading && !connectionError
+  const avatarInputRef = useRef<HTMLInputElement>(null)
+
+  const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file || !user) return
+
+    const reader = new FileReader()
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        setUser({ ...user, avatar: reader.result })
+      }
+    }
+    reader.readAsDataURL(file)
+    event.target.value = ''
+  }
 
   return (
     <div className="p-6 space-y-6">
@@ -77,15 +94,31 @@ export function SettingsPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center gap-4">
-                <div className="h-16 w-16 rounded-xl bg-gradient-to-br from-blue-500/30 to-violet-500/30 border border-white/10 flex items-center justify-center">
-                  <span className="text-xl font-bold text-white/80">
-                    {(user?.name ?? user?.username)?.charAt(0)?.toUpperCase() ?? 'A'}
-                  </span>
-                </div>
+                <Avatar
+                  src={user?.avatar}
+                  name={user?.name}
+                  username={user?.username}
+                  size="xl"
+                  className="rounded-xl"
+                />
                 <div>
                   <p className="font-medium text-foreground">{user?.name ?? user?.username}</p>
                   <p className="text-sm text-muted-foreground">{user?.email}</p>
-                  <Button variant="outline" size="sm" className="mt-2 text-xs">Change Avatar</Button>
+                  <input
+                    ref={avatarInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleAvatarChange}
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="mt-2 text-xs"
+                    onClick={() => avatarInputRef.current?.click()}
+                  >
+                    Change Avatar
+                  </Button>
                 </div>
               </div>
 

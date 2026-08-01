@@ -1,4 +1,4 @@
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
   Search,
@@ -26,6 +26,7 @@ const routeLabels: Record<string, string[]> = {
 
 export function Header() {
   const location = useLocation()
+  const navigate = useNavigate()
   const { theme, toggleTheme, openCommandPalette } = useUIStore()
   const { user } = useAuthStore()
 
@@ -107,13 +108,21 @@ export function Header() {
 
         {/* Avatar */}
         <div className="flex items-center gap-2 ml-1">
-          <Avatar
-            username={user?.username}
-            firstName={user?.username}
-            size="sm"
-            status="online"
-            className="cursor-pointer hover:ring-2 ring-primary/50 transition-all"
-          />
+          <button
+            type="button"
+            aria-label="Open profile settings"
+            onClick={() => navigate('/settings')}
+            className="rounded-full focus:outline-none focus:ring-2 focus:ring-primary/50"
+          >
+            <Avatar
+              src={user?.avatar}
+              username={user?.username}
+              firstName={user?.username}
+              size="sm"
+              status="online"
+              className="cursor-pointer hover:ring-2 ring-primary/50 transition-all"
+            />
+          </button>
         </div>
       </div>
     </header>

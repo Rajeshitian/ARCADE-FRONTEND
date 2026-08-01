@@ -40,7 +40,7 @@ const SelectContent = React.forwardRef<
     <SelectPrimitive.Content
       ref={ref}
       className={cn(
-        'relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-xl',
+        'relative z-50 max-h-96 min-w-[8rem] overflow-y-auto rounded-xl',
         'border border-white/10 bg-zinc-900/95 shadow-2xl backdrop-blur-xl',
         'data-[state=open]:animate-in data-[state=closed]:animate-out',
         'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
@@ -54,8 +54,8 @@ const SelectContent = React.forwardRef<
     >
       <SelectPrimitive.Viewport
         className={cn(
-          'max-h-60 overflow-y-auto p-1',
-          position === 'popper' && 'w-full min-w-[var(--radix-select-trigger-width)]'
+          'w-full p-1',
+          position === 'popper' && 'min-w-[var(--radix-select-trigger-width)]'
         )}
       >
         {children}
@@ -72,7 +72,7 @@ const SelectItem = React.forwardRef<
   <SelectPrimitive.Item
     ref={ref}
     className={cn(
-      'relative flex w-full cursor-default select-none items-center rounded-md py-1.5 pl-2 pr-8 text-sm outline-none',
+      'relative flex min-h-8 w-full cursor-default select-none items-center rounded-md py-1.5 pl-2 pr-8 text-sm leading-5 outline-none',
       'focus:bg-white/10 focus:text-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
       'text-foreground/80 hover:text-foreground transition-colors duration-100',
       className
@@ -84,7 +84,7 @@ const SelectItem = React.forwardRef<
         <Check className="h-4 w-4 text-primary" />
       </SelectPrimitive.ItemIndicator>
     </span>
-    <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
+    <SelectPrimitive.ItemText className="min-w-0 truncate">{children}</SelectPrimitive.ItemText>
   </SelectPrimitive.Item>
 ))
 SelectItem.displayName = SelectPrimitive.Item.displayName

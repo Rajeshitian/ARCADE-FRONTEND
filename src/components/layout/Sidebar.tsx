@@ -117,6 +117,7 @@ export function Sidebar() {
           title="Logout"
         >
           <Avatar
+            src={user?.avatar}
             firstName={user?.username?.split(' ')[0]}
             lastName={user?.username?.split(' ')[1]}
             username={user?.username}
