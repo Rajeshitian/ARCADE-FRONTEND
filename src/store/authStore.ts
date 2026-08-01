@@ -109,7 +109,7 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'arcade-auth',
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => sessionStorage),
       partialize: (state) => ({
         user: state.user,
         token: state.token,

@@ -215,11 +215,15 @@ export function EmployeeDrawer({
                           <SelectValue placeholder="Select department" />
                         </SelectTrigger>
                         <SelectContent>
-                          {departments.map((d) => (
-                            <SelectItem key={d.id} value={d.id}>
-                              {d.departmentName}
+                          {departments.length > 0 ? departments.map((d) => (
+                            <SelectItem key={d.id} value={String(d.id)}>
+                              {d.departmentName || d.departmentCode}
                             </SelectItem>
-                          ))}
+                          )) : (
+                            <SelectItem value="no-departments" disabled>
+                              No departments available
+                            </SelectItem>
+                          )}
                         </SelectContent>
                       </Select>
                     )}

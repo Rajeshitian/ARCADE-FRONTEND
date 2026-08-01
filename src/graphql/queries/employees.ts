@@ -149,11 +149,6 @@ export const GET_ALL_DEPARTMENTS = gql`
       departmentCode
       departmentName
       location
-      employees {
-        id
-        fullName
-        status
-      }
     }
   }
 `
