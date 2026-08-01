@@ -2,17 +2,16 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Bell, UserPlus, TrendingUp, LogOut, Edit,
-  Star, FileText, CheckCheck, Trash2
+  Star, FileText, CheckCheck, Trash2, Loader2, AlertTriangle
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Avatar } from '@/components/ui/avatar'
-import { MOCK_DASHBOARD_STATS } from '@/constants/mockData'
+import { useDashboardStats } from '@/hooks/useDashboardStats'
 import { formatRelativeTime, cn } from '@/utils'
 import { staggerContainer, staggerItem } from '@/animations/variants'
-import type { ActivityItem } from '@/constants/types'
 
-type FilterType = 'all' | 'unread' | 'HIRE' | 'PROMOTION' | 'REVIEW' | 'UPDATE'
+type FilterType = 'all' | 'unread' | 'HIRE' | 'UPDATE'
 
 const typeConfig: Record<string, { icon: React.ComponentType<{ className?: string }>; color: string; label: string }> = {
   HIRE:      { icon: UserPlus,  color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20', label: 'New Hire'   },
@@ -23,51 +22,13 @@ const typeConfig: Record<string, { icon: React.ComponentType<{ className?: strin
   NOTE:      { icon: FileText,  color: 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20',          label: 'Note'       },
 }
 
-// Extend mock data to have more notifications
-const MOCK_NOTIFICATIONS: ActivityItem[] = [
-  ...MOCK_DASHBOARD_STATS.recentActivity,
-  {
-    id: '6',
-    type: 'PROMOTION' as const,
-    message: 'Lucas Oliveira promoted to Principal Engineer',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 12).toISOString(),
-    user: { id: '5', name: 'David Kim', avatar: 'https://api.dicebear.com/7.x/notionists/svg?seed=david' },
-  },
-  {
-    id: '7',
-    type: 'REVIEW' as const,
-    message: 'Annual performance reviews due for Engineering team',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
-    user: { id: '10', name: 'Aria Foster', avatar: 'https://api.dicebear.com/7.x/notionists/svg?seed=aria' },
-  },
-  {
-    id: '8',
-    type: 'UPDATE' as const,
-    message: 'Salary bands updated for all departments',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 36).toISOString(),
-    user: { id: '1', name: 'Alex Chen', avatar: 'https://api.dicebear.com/7.x/notionists/svg?seed=alex' },
-  },
-  {
-    id: '9',
-    type: 'HIRE' as const,
-    message: 'Omar Hassan joined the Finance team',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
-    user: { id: '10', name: 'Aria Foster', avatar: 'https://api.dicebear.com/7.x/notionists/svg?seed=aria' },
-  },
-  {
-    id: '10',
-    type: 'NOTE' as const,
-    message: 'Q1 hiring plan submitted for board approval',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 72).toISOString(),
-    user: { id: '2', name: 'Sarah Mitchell', avatar: 'https://api.dicebear.com/7.x/notionists/svg?seed=sarah' },
-  },
-]
-
 export function NotificationsPage() {
+  const { stats, loading, error } = useDashboardStats()
   const [filter, setFilter] = useState<FilterType>('all')
   const [readIds, setReadIds] = useState<Set<string>>(new Set())
-  const [notifications, setNotifications] = useState(MOCK_NOTIFICATIONS)
+  const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set())
 
+  const notifications = stats.recentActivity.filter((n) => !dismissedIds.has(n.id))
   const unreadCount = notifications.filter((n) => !readIds.has(n.id)).length
 
   const filtered = notifications.filter((n) => {
@@ -78,16 +39,39 @@ export function NotificationsPage() {
 
   const markAllRead = () => setReadIds(new Set(notifications.map((n) => n.id)))
   const markRead = (id: string) => setReadIds((prev) => new Set([...prev, id]))
-  const dismiss = (id: string) => setNotifications((prev) => prev.filter((n) => n.id !== id))
+  const dismiss = (id: string) => setDismissedIds((prev) => new Set([...prev, id]))
 
   const filterBtns: { key: FilterType; label: string }[] = [
-    { key: 'all',       label: 'All' },
-    { key: 'unread',    label: `Unread (${unreadCount})` },
-    { key: 'HIRE',      label: 'Hires' },
-    { key: 'PROMOTION', label: 'Promotions' },
-    { key: 'REVIEW',    label: 'Reviews' },
-    { key: 'UPDATE',    label: 'Updates' },
+    { key: 'all',    label: 'All' },
+    { key: 'unread', label: `Unread (${unreadCount})` },
+    { key: 'HIRE',   label: 'Hires' },
+    { key: 'UPDATE', label: 'Updates' },
   ]
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-full py-24">
+        <div className="flex flex-col items-center gap-3 text-muted-foreground">
+          <Loader2 className="h-6 w-6 animate-spin" />
+          <p className="text-sm">Loading live activity…</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-full py-24">
+        <div className="flex flex-col items-center gap-3 text-center max-w-sm">
+          <div className="h-12 w-12 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+            <AlertTriangle className="h-5 w-5 text-red-400" />
+          </div>
+          <p className="text-sm font-medium text-foreground">Couldn't load notifications</p>
+          <p className="text-xs text-muted-foreground">{error.message}</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="p-6 space-y-5 min-h-full">
@@ -167,7 +151,11 @@ export function NotificationsPage() {
                 <Bell className="h-6 w-6 text-muted-foreground" />
               </div>
               <p className="text-sm font-medium text-foreground">No notifications</p>
-              <p className="text-xs text-muted-foreground mt-1">You're all caught up!</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {notifications.length === 0
+                  ? 'Activity from real employee records will show up here.'
+                  : "You're all caught up!"}
+              </p>
             </motion.div>
           ) : (
             filtered.map((notif) => {

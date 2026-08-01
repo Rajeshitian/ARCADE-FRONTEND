@@ -1,22 +1,22 @@
+import { useMemo } from 'react'
 import { motion } from 'framer-motion'
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer, RadarChart, PolarGrid,
-  PolarAngleAxis, Radar
+  Tooltip, ResponsiveContainer, PieChart, Pie, Cell
 } from 'recharts'
+import { Loader2, AlertTriangle } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
-import { MOCK_DASHBOARD_STATS, SALARY_CHART_DATA } from '@/constants/mockData'
+import { useDashboardStats } from '@/hooks/useDashboardStats'
 import { staggerContainer, staggerItem } from '@/animations/variants'
 import { formatCompact, getDepartmentColor } from '@/utils'
+import type { EmployeeStatus } from '@/constants/types'
 
-const radarData = [
-  { subject: 'Engineering', A: 95 },
-  { subject: 'Product', A: 82 },
-  { subject: 'Design', A: 78 },
-  { subject: 'Marketing', A: 68 },
-  { subject: 'Sales', A: 74 },
-  { subject: 'Operations', A: 71 },
-]
+const STATUS_COLORS: Record<EmployeeStatus, string> = {
+  ACTIVE: '#34d399',
+  INACTIVE: '#71717a',
+  ON_LEAVE: '#fbbf24',
+  TERMINATED: '#f87171',
+}
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
@@ -37,13 +37,46 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 }
 
 export function AnalyticsPage() {
-  const stats = MOCK_DASHBOARD_STATS
+  const { stats, employees, loading, error } = useDashboardStats()
+
+  const statusBreakdown = useMemo(() => {
+    const counts = new Map<EmployeeStatus, number>()
+    for (const e of employees) {
+      counts.set(e.status, (counts.get(e.status) ?? 0) + 1)
+    }
+    return Array.from(counts.entries()).map(([status, count]) => ({ status, count }))
+  }, [employees])
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-full py-24">
+        <div className="flex flex-col items-center gap-3 text-muted-foreground">
+          <Loader2 className="h-6 w-6 animate-spin" />
+          <p className="text-sm">Loading live analytics…</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-full py-24">
+        <div className="flex flex-col items-center gap-3 text-center max-w-sm">
+          <div className="h-12 w-12 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+            <AlertTriangle className="h-5 w-5 text-red-400" />
+          </div>
+          <p className="text-sm font-medium text-foreground">Couldn't load analytics data</p>
+          <p className="text-xs text-muted-foreground">{error.message}</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="p-6 space-y-6">
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
         <h1 className="text-2xl font-bold tracking-tight">Analytics</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">Deep insights into your workforce.</p>
+        <p className="text-sm text-muted-foreground mt-0.5">Deep insights into your workforce, live from the database.</p>
       </motion.div>
 
       <motion.div
@@ -98,7 +131,7 @@ export function AnalyticsPage() {
                     <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
                     <Bar dataKey="count" radius={[0, 4, 4, 0]}>
                       {stats.departmentBreakdown.slice(0, 7).map((entry) => (
-                        <rect key={entry.department} fill={getDepartmentColor(entry.department)} />
+                        <Cell key={entry.department} fill={getDepartmentColor(entry.department)} />
                       ))}
                     </Bar>
                   </BarChart>
@@ -108,23 +141,22 @@ export function AnalyticsPage() {
           </Card>
         </motion.div>
 
-        {/* Salary budget */}
+        {/* Avg salary by department */}
         <motion.div variants={staggerItem}>
           <Card className="h-full">
             <CardHeader>
-              <CardTitle>Payroll Budget vs Actual</CardTitle>
-              <CardDescription>Annual comparison</CardDescription>
+              <CardTitle>Average Salary by Department</CardTitle>
+              <CardDescription>Live figures from current records</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="h-56">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={SALARY_CHART_DATA} margin={{ top: 4, right: 4, bottom: 0, left: -10 }}>
+                  <BarChart data={stats.departmentBreakdown.slice(0, 8)} margin={{ top: 4, right: 4, bottom: 0, left: -10 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
-                    <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.4)' }} axisLine={false} tickLine={false} />
+                    <XAxis dataKey="department" tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.4)' }} axisLine={false} tickLine={false} />
                     <YAxis tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.4)' }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${formatCompact(v)}`} />
                     <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
-                    <Bar dataKey="budget" fill="rgba(99,102,241,0.4)" radius={[3, 3, 0, 0]} />
-                    <Bar dataKey="actual" fill="rgba(139,92,246,0.7)" radius={[3, 3, 0, 0]} />
+                    <Bar dataKey="avgSalary" fill="rgba(139,92,246,0.7)" radius={[3, 3, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -132,22 +164,43 @@ export function AnalyticsPage() {
           </Card>
         </motion.div>
 
-        {/* Radar */}
+        {/* Status distribution */}
         <motion.div variants={staggerItem}>
           <Card className="h-full">
             <CardHeader>
-              <CardTitle>Team Performance Index</CardTitle>
-              <CardDescription>Department productivity scores</CardDescription>
+              <CardTitle>Employee Status Distribution</CardTitle>
+              <CardDescription>Live breakdown by employment status</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="h-56">
                 <ResponsiveContainer width="100%" height="100%">
-                  <RadarChart data={radarData}>
-                    <PolarGrid stroke="rgba(255,255,255,0.06)" />
-                    <PolarAngleAxis dataKey="subject" tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.4)' }} />
-                    <Radar name="Score" dataKey="A" stroke="#6366f1" fill="#6366f1" fillOpacity={0.2} strokeWidth={2} />
-                  </RadarChart>
+                  <PieChart>
+                    <Pie
+                      data={statusBreakdown}
+                      dataKey="count"
+                      nameKey="status"
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={50}
+                      outerRadius={80}
+                      paddingAngle={3}
+                      strokeWidth={0}
+                    >
+                      {statusBreakdown.map((entry) => (
+                        <Cell key={entry.status} fill={STATUS_COLORS[entry.status]} />
+                      ))}
+                    </Pie>
+                    <Tooltip content={<CustomTooltip />} />
+                  </PieChart>
                 </ResponsiveContainer>
+              </div>
+              <div className="mt-2 flex flex-wrap gap-3 justify-center">
+                {statusBreakdown.map((s) => (
+                  <div key={s.status} className="flex items-center gap-1.5">
+                    <div className="h-2 w-2 rounded-full" style={{ background: STATUS_COLORS[s.status] }} />
+                    <span className="text-xs text-muted-foreground">{s.status} ({s.count})</span>
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>

@@ -16,6 +16,7 @@ interface AuthState {
   token: string | null
   tokenType: string
   expiresIn: number | null
+  loginAt: string | null
   isAuthenticated: boolean
   isLoading: boolean
 
@@ -27,7 +28,7 @@ interface AuthState {
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8080'
 const GRAPHQL_URL = `${API_URL}/graphql`
 
-// Use GraphQL login mutation directly (matches your schema: login(input: LoginInput!): AuthPayload!)
+// GraphQL login mutation (matches backend schema: login(input: LoginInput!): AuthPayload!)
 const LOGIN_QUERY = `
   mutation Login($input: LoginInput!) {
     login(input: $input) {
@@ -51,65 +52,47 @@ export const useAuthStore = create<AuthState>()(
       token: null,
       tokenType: 'Bearer',
       expiresIn: null,
+      loginAt: null,
       isAuthenticated: false,
       isLoading: false,
 
       login: async ({ usernameOrEmail, password }) => {
         set({ isLoading: true })
         try {
-          let user: User
-          let token: string
-          let tokenType = 'Bearer'
-          let expiresIn: number | null = null
+          const response = await fetch(GRAPHQL_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              query: LOGIN_QUERY,
+              variables: { input: { usernameOrEmail, password } },
+            }),
+          })
 
-          try {
-            // Call GraphQL login mutation directly
-            const response = await fetch(GRAPHQL_URL, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                query: LOGIN_QUERY,
-                variables: { input: { usernameOrEmail, password } },
-              }),
-            })
+          const json = await response.json()
 
-            const json = await response.json()
-
-            if (json.errors?.length) {
-              throw new Error(json.errors[0].message ?? 'Login failed')
-            }
-
-            const payload = json.data?.login
-            if (!payload?.token) throw new Error('No token in response')
-
-            token = payload.token
-            tokenType = payload.tokenType ?? 'Bearer'
-            expiresIn = payload.expiresIn ?? null
-            user = {
-              id: payload.user.id,
-              username: payload.user.username,
-              email: payload.user.email,
-              roles: payload.user.roles ?? ['EMPLOYEE'],
-            }
-          } catch (apiError) {
-            // Demo fallback — only when backend is unreachable
-            if (
-              (usernameOrEmail === 'admin@arcade.ai' || usernameOrEmail === 'admin') &&
-              password === 'demo1234'
-            ) {
-              user = {
-                id: '1',
-                username: 'admin',
-                email: 'admin@arcade.ai',
-                roles: ['ADMIN'],
-              }
-              token = 'demo-jwt-token-' + Date.now()
-            } else {
-              throw apiError
-            }
+          if (json.errors?.length) {
+            throw new Error(json.errors[0].message ?? 'Login failed')
           }
 
-          set({ user, token, tokenType, expiresIn, isAuthenticated: true, isLoading: false })
+          const payload = json.data?.login
+          if (!payload?.token) throw new Error('No token in response')
+
+          const user: User = {
+            id: payload.user.id,
+            username: payload.user.username,
+            email: payload.user.email,
+            roles: payload.user.roles ?? ['EMPLOYEE'],
+          }
+
+          set({
+            user,
+            token: payload.token,
+            tokenType: payload.tokenType ?? 'Bearer',
+            expiresIn: payload.expiresIn ?? null,
+            loginAt: new Date().toISOString(),
+            isAuthenticated: true,
+            isLoading: false,
+          })
         } catch (error) {
           set({ isLoading: false })
           throw error
@@ -117,7 +100,7 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: () => {
-        set({ user: null, token: null, expiresIn: null, isAuthenticated: false })
+        set({ user: null, token: null, expiresIn: null, loginAt: null, isAuthenticated: false })
       },
 
       setUser: (user: User) => set({ user }),
@@ -129,6 +112,7 @@ export const useAuthStore = create<AuthState>()(
         user: state.user,
         token: state.token,
         tokenType: state.tokenType,
+        loginAt: state.loginAt,
         isAuthenticated: state.isAuthenticated,
       }),
     }

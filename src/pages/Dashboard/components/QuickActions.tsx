@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
-import { UserPlus, Download, FileText, Sparkles } from 'lucide-react'
+import { UserPlus, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 export function QuickActions() {

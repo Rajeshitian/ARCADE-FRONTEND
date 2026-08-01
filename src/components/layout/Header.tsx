@@ -5,7 +5,6 @@ import {
   Bell,
   Sun,
   Moon,
-  Command,
   ChevronRight,
 } from 'lucide-react'
 import { cn } from '@/utils'
@@ -13,7 +12,6 @@ import { useUIStore } from '@/store/uiStore'
 import { useAuthStore } from '@/store/authStore'
 import { Button } from '@/components/ui/button'
 import { Avatar } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
 
 const routeLabels: Record<string, string[]> = {
   '/': ['Dashboard'],
@@ -32,7 +30,6 @@ export function Header() {
   const { user } = useAuthStore()
 
   const breadcrumbs = routeLabels[location.pathname] ?? ['Page']
-  const pageTitle = breadcrumbs[breadcrumbs.length - 1]
 
   return (
     <header className="relative h-16 flex items-center justify-between px-6 border-b border-white/[0.05] bg-zinc-950/60 backdrop-blur-xl flex-shrink-0 z-20">

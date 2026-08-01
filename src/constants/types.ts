@@ -91,6 +91,37 @@ export interface ActivityItem {
   }
 }
 
+// ─── Dashboard (all fields derived client-side from real Employee/Department data) ──
+
+export interface DepartmentBreakdown {
+  department: string
+  count: number
+  avgSalary: number
+}
+
+export interface MonthlyHireCount {
+  month: string
+  count: number
+}
+
+export interface PerformanceMetric {
+  label: string
+  value: number
+  displayValue: string
+  barPercent: number
+}
+
+export interface DashboardStats {
+  totalEmployees: number
+  activeEmployees: number
+  newHiresThisMonth: number
+  avgSalary: number
+  departmentBreakdown: DepartmentBreakdown[]
+  monthlyHires: MonthlyHireCount[]
+  recentActivity: ActivityItem[]
+  performanceMetrics: PerformanceMetric[]
+}
+
 // ─── Auth ─────────────────────────────────────────────────────────────────────
 
 export interface AuthUser {

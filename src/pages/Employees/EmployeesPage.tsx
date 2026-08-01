@@ -1,7 +1,7 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Search, Plus, Download, X } from 'lucide-react'
+import { Search, Plus, Download, X, Loader2, AlertTriangle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -18,13 +18,8 @@ import {
   useAllProjects, useAllRoles,
   useCreateEmployee, useUpdateEmployee, useDeleteEmployee,
 } from '@/hooks/useEmployees'
-import {
-  MOCK_EMPLOYEES, MOCK_DEPARTMENTS,
-  MOCK_PROJECTS, MOCK_ROLES,
-} from '@/constants/mockData'
-import type { Employee, EmployeeFilterInput, SortInput, SortDirection, Department, Project, Role } from '@/constants/types'
+import type { Department, Employee, EmployeeFilterInput, SortInput, SortDirection } from '@/constants/types'
 import type { EmployeeFormData } from '@/modules/employees/employeeSchema'
-import { generateId } from '@/utils'
 
 const PAGE_SIZE = 10
 
@@ -49,70 +44,31 @@ export function EmployeesPage() {
   const [deleteTarget,     setDeleteTarget]     = useState<Employee | null>(null)
   const [deleteLoading,    setDeleteLoading]    = useState(false)
 
-  // ── GraphQL ───────────────────────────────────────────────────────────────
+  // ── GraphQL — live data only ─────────────────────────────────────────────
   const filter: EmployeeFilterInput = {
-    ...(search                   ? { search }                                  : {}),
-    ...(departmentId !== 'all'   ? { departmentId }                            : {}),
-    ...(statusFilter !== 'all'   ? { status: statusFilter as any }             : {}),
+    ...(search                 ? { search }                      : {}),
+    ...(departmentId !== 'all' ? { departmentId }                : {}),
+    ...(statusFilter !== 'all' ? { status: statusFilter as any }  : {}),
   }
   const sort: SortInput = { field: sortField, direction: sortDir }
 
-  const { data: empData,  loading: empLoading  } = useAllEmployees(page, PAGE_SIZE, filter, sort)
+  const { data: empData,  loading: empLoading, error: empError } = useAllEmployees(page, PAGE_SIZE, filter, sort)
   const { data: deptData } = useAllDepartments()
-  const { data: projData                       } = useAllProjects()
-  const { data: roleData                       } = useAllRoles()
+  const { data: projData } = useAllProjects()
+  const { data: roleData } = useAllRoles()
 
   const [createEmployee] = useCreateEmployee()
   const [updateEmployee] = useUpdateEmployee()
   const [deleteEmployee] = useDeleteEmployee()
 
-  // ── Data — real from DB or mock fallback ──────────────────────────────────
-  const isDemo       = !empData?.getAllEmployees
-  const employees    = isDemo
-    ? MOCK_EMPLOYEES
-    : (empData.getAllEmployees.content as Employee[])
+  const employees   = (empData?.getAllEmployees?.content ?? []) as Employee[]
+  const departments = (deptData?.getAllDepartments ?? []) as Department[]
+  const projects     = projData?.getAllProjects ?? []
+  const roles         = roleData?.getAllRoles ?? []
 
-  const departments  = (deptData?.getAllDepartments  as Department[] | undefined)
-    ?? MOCK_DEPARTMENTS   // ← always populated (DB or mock)
-
-  const projects     = projData?.getAllProjects  ?? MOCK_PROJECTS
-  const roles        = roleData?.getAllRoles     ?? MOCK_ROLES
-
-  const pageInfo     = empData?.getAllEmployees?.pageInfo
-  const totalPages   = pageInfo?.totalPages   ?? Math.ceil(MOCK_EMPLOYEES.length / PAGE_SIZE)
-  const totalElems   = pageInfo?.totalElements ?? MOCK_EMPLOYEES.length
-
-  // ── Client-side filter for demo mode ─────────────────────────────────────
-  const displayedEmployees = useMemo(() => {
-    if (!isDemo) return employees
-
-    let result = [...employees]
-
-    if (search) {
-      const q = search.toLowerCase()
-      result = result.filter(
-        (e) =>
-          e.fullName.toLowerCase().includes(q) ||
-          e.email.toLowerCase().includes(q) ||
-          e.employeeCode.toLowerCase().includes(q)
-      )
-    }
-    if (departmentId !== 'all') {
-      result = result.filter((e) => e.department.id === departmentId)
-    }
-    if (statusFilter !== 'all') {
-      result = result.filter((e) => e.status === statusFilter)
-    }
-
-    result.sort((a, b) => {
-      const av = String((a as any)[sortField] ?? '')
-      const bv = String((b as any)[sortField] ?? '')
-      return sortDir === 'ASC' ? av.localeCompare(bv) : bv.localeCompare(av)
-    })
-
-    const start = page * PAGE_SIZE
-    return result.slice(start, start + PAGE_SIZE)
-  }, [isDemo, employees, search, departmentId, statusFilter, sortField, sortDir, page])
+  const pageInfo   = empData?.getAllEmployees?.pageInfo
+  const totalPages = pageInfo?.totalPages   ?? 0
+  const totalElems = pageInfo?.totalElements ?? 0
 
   const handleSort = useCallback((field: string) => {
     setSortDir((prev) => (sortField === field && prev === 'ASC' ? 'DESC' : 'ASC'))
@@ -120,7 +76,7 @@ export function EmployeesPage() {
     setPage(0)
   }, [sortField])
 
-  // ── CRUD handlers ─────────────────────────────────────────────────────────
+  // ── CRUD handlers — all go straight to the live backend ───────────────────
   const openCreate = () => {
     setDrawerMode('create')
     setSelectedEmployee(null)
@@ -148,42 +104,12 @@ export function EmployeesPage() {
       }
 
       if (drawerMode === 'create') {
-        if (isDemo) {
-          // Demo mode — add locally
-          const dept = departments.find((d) => d.id === data.departmentId) ?? departments[0]!
-          const newEmp: Employee = {
-            id:           generateId(),
-            employeeCode: data.employeeCode,
-            firstName:    data.firstName,
-            lastName:     data.lastName,
-            fullName:     `${data.firstName} ${data.lastName}`,
-            email:        data.email,
-            phoneNumber:  data.phoneNumber,
-            salary:       Number(data.salary),
-            joiningDate:  data.joiningDate,
-            status:       data.status,
-            department:   dept,
-            address: {
-              id: generateId(),
-              ...data.address,
-            },
-            projects: projects.filter((p: Project) => data.projectIds?.includes(p.id)),
-            roles:    roles.filter((r: Role) => data.roleIds?.includes(r.id)),
-          }
-          // In demo mode we just show toast (can't mutate MOCK_EMPLOYEES const easily)
-          success('Employee added (demo)', `${newEmp.fullName} added locally.`)
-        } else {
-          await createEmployee({ variables: { input } })
-          success('Employee added', `${data.firstName} ${data.lastName} has been added.`)
-        }
+        await createEmployee({ variables: { input } })
+        success('Employee added', `${data.firstName} ${data.lastName} has been added.`)
       } else if (selectedEmployee) {
-        if (isDemo) {
-          success('Changes saved (demo)', `${data.firstName} ${data.lastName} updated.`)
-        } else {
-          const { employeeCode: _ec, ...updateInput } = input
-          await updateEmployee({ variables: { id: selectedEmployee.id, input: updateInput } })
-          success('Changes saved', `${data.firstName} ${data.lastName} updated.`)
-        }
+        const { employeeCode: _ec, ...updateInput } = input
+        await updateEmployee({ variables: { id: selectedEmployee.id, input: updateInput } })
+        success('Changes saved', `${data.firstName} ${data.lastName} updated.`)
       }
       setDrawerOpen(false)
     } catch (err: unknown) {
@@ -195,9 +121,7 @@ export function EmployeesPage() {
     if (!deleteTarget) return
     setDeleteLoading(true)
     try {
-      if (!isDemo) {
-        await deleteEmployee({ variables: { id: deleteTarget.id } })
-      }
+      await deleteEmployee({ variables: { id: deleteTarget.id } })
       success('Employee removed', `${deleteTarget.fullName} has been deleted.`)
       setDeleteOpen(false)
       setDeleteTarget(null)
@@ -208,7 +132,31 @@ export function EmployeesPage() {
     }
   }
 
+  const handleBulkDelete = async () => {
+    try {
+      await Promise.all(selectedIds.map((id) => deleteEmployee({ variables: { id } })))
+      success(`${selectedIds.length} employees removed`)
+      setSelectedIds([])
+    } catch (err: unknown) {
+      toastError('Bulk delete failed', err instanceof Error ? err.message : 'An error occurred')
+    }
+  }
+
   const hasFilters = search || departmentId !== 'all' || statusFilter !== 'all'
+
+  if (empError) {
+    return (
+      <div className="flex items-center justify-center min-h-full py-24">
+        <div className="flex flex-col items-center gap-3 text-center max-w-sm">
+          <div className="h-12 w-12 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+            <AlertTriangle className="h-5 w-5 text-red-400" />
+          </div>
+          <p className="text-sm font-medium text-foreground">Couldn't load employees</p>
+          <p className="text-xs text-muted-foreground">{empError.message}</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="p-6 space-y-5 min-h-full">
@@ -223,9 +171,6 @@ export function EmployeesPage() {
           <h1 className="text-2xl font-bold tracking-tight">Employees</h1>
           <p className="text-sm text-muted-foreground mt-0.5">
             {totalElems} team members
-            {isDemo && (
-              <span className="ml-2 text-amber-400/80 text-xs">(demo mode)</span>
-            )}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -264,7 +209,7 @@ export function EmployeesPage() {
           />
         </div>
 
-        {/* Department filter — uses real departments from DB */}
+        {/* Department filter */}
         <Select
           value={departmentId}
           onValueChange={(v) => { setDepartmentId(v); setPage(0) }}
@@ -275,7 +220,7 @@ export function EmployeesPage() {
           <SelectContent>
             <SelectItem value="all">All Departments</SelectItem>
             {departments.map((d) => (
-              <SelectItem key={d.id} value={d.id}>
+              <SelectItem key={d.id} value={String(d.id)}>
                 {d.departmentName}
               </SelectItem>
             ))}
@@ -319,10 +264,7 @@ export function EmployeesPage() {
             <Button
               size="sm"
               className="text-xs bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20"
-              onClick={() => {
-                success(`${selectedIds.length} employees removed`)
-                setSelectedIds([])
-              }}
+              onClick={handleBulkDelete}
             >
               Delete Selected
             </Button>
@@ -337,24 +279,40 @@ export function EmployeesPage() {
         transition={{ delay: 0.15 }}
       >
         <Card className="overflow-hidden">
-          <EmployeeTable
-            employees={displayedEmployees}
-            loading={empLoading}
-            sortField={sortField}
-            sortDir={sortDir}
-            onSort={handleSort}
-            onEdit={openEdit}
-            onDelete={openDelete}
-            selectedIds={selectedIds}
-            onSelectId={(id) =>
-              setSelectedIds((prev) =>
-                prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
-              )
-            }
-            onSelectAll={(checked) =>
-              setSelectedIds(checked ? displayedEmployees.map((e) => e.id) : [])
-            }
-          />
+          {empLoading ? (
+            <div className="flex items-center justify-center py-20">
+              <div className="flex flex-col items-center gap-3 text-muted-foreground">
+                <Loader2 className="h-6 w-6 animate-spin" />
+                <p className="text-sm">Loading live employee data…</p>
+              </div>
+            </div>
+          ) : employees.length === 0 ? (
+            <div className="py-20 text-center">
+              <p className="text-sm font-medium text-foreground">No employees found</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {hasFilters ? 'Try adjusting your filters.' : 'Add your first employee to get started.'}
+              </p>
+            </div>
+          ) : (
+            <EmployeeTable
+              employees={employees}
+              loading={false}
+              sortField={sortField}
+              sortDir={sortDir}
+              onSort={handleSort}
+              onEdit={openEdit}
+              onDelete={openDelete}
+              selectedIds={selectedIds}
+              onSelectId={(id) =>
+                setSelectedIds((prev) =>
+                  prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+                )
+              }
+              onSelectAll={(checked) =>
+                setSelectedIds(checked ? employees.map((e) => e.id) : [])
+              }
+            />
+          )}
 
           {/* Pagination */}
           {totalPages > 1 && (
@@ -393,16 +351,16 @@ export function EmployeesPage() {
         </Card>
       </motion.div>
 
-      {/* ── Drawer — receives real departments/projects/roles ── */}
+      {/* ── Drawer ── */}
       <EmployeeDrawer
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         onSave={handleSave}
         employee={selectedEmployee}
         mode={drawerMode}
-        departments={departments}   // ← DB data or mock fallback
-        projects={projects}         // ← DB data or mock fallback
-        roles={roles}               // ← DB data or mock fallback
+        departments={departments}
+        projects={projects}
+        roles={roles}
       />
 
       {/* ── Delete dialog ── */}

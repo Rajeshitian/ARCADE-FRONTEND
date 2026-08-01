@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useAuthStore } from '@/store/authStore'
 import { useUIStore } from '@/store/uiStore'
+import { useAllDepartments } from '@/hooks/useEmployees'
 import { cn } from '@/utils'
 
 const tabs = [
@@ -16,9 +17,13 @@ const tabs = [
   { id: 'api', label: 'API Keys', icon: Key },
 ]
 
+const GRAPHQL_URL = `${import.meta.env.VITE_API_URL ?? 'http://localhost:8080'}/graphql`
+
 export function SettingsPage() {
   const { user } = useAuthStore()
   const { theme, toggleTheme } = useUIStore()
+  const { error: connectionError, loading: connectionLoading } = useAllDepartments()
+  const connectionOk = !connectionLoading && !connectionError
 
   return (
     <div className="p-6 space-y-6">
@@ -145,20 +150,25 @@ export function SettingsPage() {
           <Card>
             <CardHeader>
               <CardTitle>Backend Integration</CardTitle>
-              <CardDescription>Configure the GraphQL endpoint connection</CardDescription>
+              <CardDescription>Live GraphQL endpoint configuration</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-1.5">
                 <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">GraphQL Endpoint</label>
-                <Input defaultValue="http://localhost:8080/graphql" />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">WebSocket URL</label>
-                <Input defaultValue="ws://localhost:8080/graphql" />
+                <Input defaultValue={GRAPHQL_URL} disabled />
               </div>
               <div className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-amber-400" />
-                <span className="text-xs text-muted-foreground">Backend not connected — running in demo mode</span>
+                <div className={cn(
+                  'h-2 w-2 rounded-full',
+                  connectionLoading ? 'bg-amber-400 animate-pulse' : connectionOk ? 'bg-emerald-400' : 'bg-red-400'
+                )} />
+                <span className="text-xs text-muted-foreground">
+                  {connectionLoading
+                    ? 'Checking connection…'
+                    : connectionOk
+                    ? 'Connected to live backend'
+                    : "Couldn't reach the backend — check your connection"}
+                </span>
               </div>
             </CardContent>
           </Card>

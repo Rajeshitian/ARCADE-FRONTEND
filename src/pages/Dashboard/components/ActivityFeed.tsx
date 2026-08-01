@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { UserPlus, TrendingUp, LogOut, Edit, Star, FileText, Zap } from 'lucide-react'
+import { UserPlus, TrendingUp, LogOut, Edit, Star, FileText } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
 import { Avatar } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
@@ -40,6 +40,11 @@ export function ActivityFeed({ activities }: ActivityFeedProps) {
         </div>
       </CardHeader>
       <CardContent>
+        {activities.length === 0 ? (
+          <div className="py-10 text-center">
+            <p className="text-sm text-muted-foreground">No recent activity yet.</p>
+          </div>
+        ) : (
         <div className="space-y-1">
           {activities.map((activity, i) => {
             const config = activityConfig[activity.type] ?? activityConfig.NOTE
@@ -76,6 +81,7 @@ export function ActivityFeed({ activities }: ActivityFeedProps) {
             )
           })}
         </div>
+        )}
       </CardContent>
     </Card>
   )

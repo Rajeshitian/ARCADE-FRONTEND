@@ -11,7 +11,6 @@ import {
 import { useAuthStore } from '@/store/authStore'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { cn } from '@/utils'
 
 const schema = z.object({
   usernameOrEmail: z.string().min(1, 'Username or email is required'),
@@ -48,7 +47,6 @@ export function LoginPage() {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-    setValue,
   } = useForm<FormData>({ resolver: zodResolver(schema) })
 
   useEffect(() => {
@@ -63,11 +61,6 @@ export function LoginPage() {
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Login failed')
     }
-  }
-
-  const fillDemo = () => {
-    setValue('usernameOrEmail', 'admin@arcade.ai')
-    setValue('password', 'demo1234')
   }
 
   return (
@@ -237,35 +230,6 @@ export function LoginPage() {
               {!isSubmitting && (<>Sign in <ArrowRight className="ml-2 h-4 w-4" /></>)}
             </Button>
           </motion.form>
-
-          {/* Divider */}
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-white/[0.06]" />
-            </div>
-            <div className="relative flex justify-center text-xs">
-              <span className="px-3 bg-zinc-950/90 text-muted-foreground/60">Demo access</span>
-            </div>
-          </div>
-
-          {/* Demo button */}
-          <motion.button
-            onClick={fillDemo}
-            className={cn(
-              'w-full h-10 rounded-xl border border-white/[0.08] bg-white/[0.03]',
-              'text-sm text-muted-foreground hover:text-foreground hover:bg-white/[0.06] hover:border-white/[0.12]',
-              'transition-all duration-200 flex items-center justify-center gap-2'
-            )}
-            whileHover={{ scale: 1.01 }}
-            whileTap={{ scale: 0.99 }}
-          >
-            <Sparkles className="h-3.5 w-3.5 text-blue-400" />
-            Fill demo credentials
-          </motion.button>
-
-          <p className="mt-5 text-center text-xs text-muted-foreground/50">
-            admin@arcade.ai · demo1234 (offline demo)
-          </p>
         </div>
       </motion.div>
     </div>

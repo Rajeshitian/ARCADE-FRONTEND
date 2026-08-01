@@ -7,8 +7,6 @@ import {
   Users,
   Settings,
   BarChart3,
-  Zap,
-  Shield,
   Plus,
   ArrowRight,
 } from 'lucide-react'

@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import {
-  Users, Activity, UserPlus, DollarSign
+  Users, Activity, UserPlus, DollarSign, Loader2, AlertTriangle
 } from 'lucide-react'
 import { staggerContainer } from '@/animations/variants'
 import { StatCard } from '@/components/charts/StatCard'
@@ -10,15 +10,37 @@ import { HiringChart } from './components/HiringChart'
 import { SalaryChart } from './components/SalaryChart'
 import { PerformanceWidget } from './components/PerformanceWidget'
 import { QuickActions } from './components/QuickActions'
-import { MOCK_DASHBOARD_STATS } from '@/constants/mockData'
-import { useAllEmployees } from '@/hooks/useEmployees'
+import { useDashboardStats } from '@/hooks/useDashboardStats'
+import { useAuthStore } from '@/store/authStore'
 
 export function DashboardPage() {
-  // Fetch real employee count from backend
-  const { data: empData } = useAllEmployees(0, 1) // page 0, size 1 — we only need totalElements
-  const totalEmployees = empData?.getAllEmployees?.pageInfo?.totalElements ?? MOCK_DASHBOARD_STATS.totalEmployees
-  const activeEmployees = MOCK_DASHBOARD_STATS.activeEmployees
-  const stats = { ...MOCK_DASHBOARD_STATS, totalEmployees }
+  const { stats, loading, error } = useDashboardStats()
+  const { user } = useAuthStore()
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-full py-24">
+        <div className="flex flex-col items-center gap-3 text-muted-foreground">
+          <Loader2 className="h-6 w-6 animate-spin" />
+          <p className="text-sm">Loading live dashboard data…</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-full py-24">
+        <div className="flex flex-col items-center gap-3 text-center max-w-sm">
+          <div className="h-12 w-12 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+            <AlertTriangle className="h-5 w-5 text-red-400" />
+          </div>
+          <p className="text-sm font-medium text-foreground">Couldn't load dashboard data</p>
+          <p className="text-xs text-muted-foreground">{error.message}</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="p-6 space-y-6 min-h-full">
@@ -31,7 +53,7 @@ export function DashboardPage() {
       >
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground">
-            Good morning, Alex 👋
+            Welcome back{user?.name || user?.username ? `, ${user.name ?? user.username}` : ''} 👋
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5">
             Here's what's happening with your team today.
@@ -49,9 +71,7 @@ export function DashboardPage() {
       >
         <StatCard
           label="Total Employees"
-          value={totalEmployees}
-          change={4.2}
-          trend="UP"
+          value={stats.totalEmployees}
           icon={Users}
           iconColor="text-blue-400"
           iconBg="bg-blue-500/10"
@@ -59,9 +79,7 @@ export function DashboardPage() {
         />
         <StatCard
           label="Active Members"
-          value={activeEmployees}
-          change={2.1}
-          trend="UP"
+          value={stats.activeEmployees}
           icon={Activity}
           iconColor="text-emerald-400"
           iconBg="bg-emerald-500/10"
@@ -69,9 +87,7 @@ export function DashboardPage() {
         />
         <StatCard
           label="New Hires (MTD)"
-          value={stats.newHires}
-          change={12.5}
-          trend="UP"
+          value={stats.newHiresThisMonth}
           icon={UserPlus}
           iconColor="text-violet-400"
           iconBg="bg-violet-500/10"
@@ -81,8 +97,6 @@ export function DashboardPage() {
           label="Avg. Salary"
           value={stats.avgSalary}
           format="currency"
-          change={3.8}
-          trend="UP"
           icon={DollarSign}
           iconColor="text-amber-400"
           iconBg="bg-amber-500/10"
@@ -113,7 +127,7 @@ export function DashboardPage() {
         className="grid grid-cols-1 lg:grid-cols-3 gap-4"
       >
         <div className="lg:col-span-2">
-          <SalaryChart />
+          <SalaryChart data={stats.departmentBreakdown} />
         </div>
         <div>
           <PerformanceWidget metrics={stats.performanceMetrics} />
