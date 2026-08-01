@@ -173,7 +173,7 @@ export function EmployeeTable({
 
                 {/* Actions */}
                 <td className="px-3 py-3 w-12">
-                  <div className="relative">
+                  <div className="relative" data-row-menu>
                     <Button
                       type="button"
                       variant="ghost"
@@ -191,7 +191,6 @@ export function EmployeeTable({
                     <AnimatePresence>
                       {menuOpen === emp.id && (
                         <motion.div
-                          data-row-menu
                           initial={{ opacity: 0, scale: 0.9, y: -5 }}
                           animate={{ opacity: 1, scale: 1, y: 0 }}
                           exit={{ opacity: 0, scale: 0.9, y: -5 }}
