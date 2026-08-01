@@ -51,7 +51,7 @@ export function EmployeeTable({
   useEffect(() => {
     const handleDocumentClick = (event: MouseEvent) => {
       if (!(event.target instanceof HTMLElement)) return
-      if (event.target.closest('[data-row-menu]')) return
+      if (event.target.closest('[data-row-menu], [data-ignore-close]')) return
       setMenuOpen(null)
     }
 
@@ -118,7 +118,7 @@ export function EmployeeTable({
                 )}
               >
                 {/* Checkbox */}
-                <td className="w-10 px-4 py-3">
+                <td className="w-10 px-4 py-3" data-ignore-close>
                   <input
                     type="checkbox"
                     className="h-3.5 w-3.5 rounded border-white/20 bg-white/5 accent-blue-500"
@@ -128,7 +128,7 @@ export function EmployeeTable({
                 </td>
 
                 {/* Employee name + email */}
-                <td className="px-3 py-3">
+                <td className="px-3 py-3" data-ignore-close>
                   <div className="flex items-center gap-3">
                     <Avatar
                       firstName={emp.firstName}
