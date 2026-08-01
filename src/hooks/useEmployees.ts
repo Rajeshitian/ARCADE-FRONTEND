@@ -84,7 +84,10 @@ export function useEmployeesByStatus(status: EmployeeStatus) {
 // ─── Department Queries ───────────────────────────────────────────────────────
 
 export function useAllDepartments() {
-  return useQuery(GET_ALL_DEPARTMENTS, { errorPolicy: 'all' })
+  return useQuery(GET_ALL_DEPARTMENTS, {
+    errorPolicy: 'all',
+    fetchPolicy: 'network-only',
+  })
 }
 
 // ─── Project Queries ──────────────────────────────────────────────────────────

@@ -62,7 +62,10 @@ export function EmployeesPage() {
   const [deleteEmployee] = useDeleteEmployee()
 
   const employees   = (empData?.getAllEmployees?.content ?? []) as Employee[]
-  const departments = (deptData?.getAllDepartments ?? []) as Department[]
+  const departmentResult = deptData?.getAllDepartments
+  const departments = (Array.isArray(departmentResult)
+    ? departmentResult
+    : departmentResult?.content ?? departmentResult?.items ?? []) as Department[]
   const projects     = projData?.getAllProjects ?? []
   const roles         = roleData?.getAllRoles ?? []
 

@@ -44,6 +44,10 @@ The app runs in **demo mode** when the Spring Boot backend is not available. All
 
 Point to your Spring Boot GraphQL backend by updating `src/services/apollo.ts`:
 
+Create a `.env` file from `.env.example` and set the backend host. The default development URL is `http://localhost:8080`.
+
+The employee department selector calls `getAllDepartments` and expects the backend to return department records with `id`, `departmentCode`, `departmentName`, and `location`. At least one department must exist in the backend database before it can be selected.
+
 ```typescript
 const GRAPHQL_URL = 'http://localhost:8080/graphql'
 const WS_URL = 'ws://localhost:8080/graphql'

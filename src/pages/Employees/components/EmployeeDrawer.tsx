@@ -232,7 +232,7 @@ export function EmployeeDrawer({
                             </SelectItem>
                           )) : (
                             <SelectItem value="no-departments" disabled>
-                              No departments available
+                              No departments returned by backend
                             </SelectItem>
                           )}
                         </SelectContent>
