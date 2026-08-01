@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   ChevronUp, ChevronDown, ChevronsUpDown,
@@ -45,13 +45,15 @@ export function EmployeeTable({
   employees, loading, sortField, sortDir, onSort,
   onEdit, onDelete, selectedIds, onSelectId, onSelectAll,
 }: EmployeeTableProps) {
+  const tableRef = useRef<HTMLDivElement | null>(null)
   const [hovered, setHovered] = useState<string | null>(null)
   const [menuOpen, setMenuOpen] = useState<string | null>(null)
 
   useEffect(() => {
     const handleDocumentClick = (event: MouseEvent) => {
-      if (!(event.target instanceof HTMLElement)) return
-      if (event.target.closest('[data-row-menu], [data-ignore-close]')) return
+      if (!(event.target instanceof Node)) return
+      if (event.target instanceof HTMLElement && event.target.closest('[data-row-menu], [data-ignore-close]')) return
+      if (tableRef.current && event.target === tableRef.current) return
       setMenuOpen(null)
     }
 
@@ -69,7 +71,7 @@ export function EmployeeTable({
   if (loading) return <SkeletonTable rows={8} />
 
   return (
-    <div className="overflow-x-auto">
+    <div ref={tableRef} className="overflow-x-auto">
       <table className="w-full min-w-[800px]">
         <thead>
           <tr className="border-b border-white/[0.05]">
