@@ -42,7 +42,7 @@ export function Sidebar() {
       initial={false}
       animate={{ width: sidebarCollapsed ? 64 : 260 }}
       transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
-      className="relative flex flex-col h-full bg-zinc-950/80 backdrop-blur-xl border-r border-white/[0.05] overflow-hidden z-30"
+      className="relative hidden md:flex flex-col h-full bg-zinc-950/80 backdrop-blur-xl border-r border-white/[0.05] overflow-visible z-30"
     >
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute inset-0 bg-gradient-to-b from-blue-950/20 via-transparent to-violet-950/20" />

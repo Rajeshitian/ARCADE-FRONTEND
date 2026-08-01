@@ -32,7 +32,7 @@ export function Header() {
   const breadcrumbs = routeLabels[location.pathname] ?? ['Page']
 
   return (
-    <header className="relative h-16 flex items-center justify-between px-6 border-b border-white/[0.05] bg-zinc-950/60 backdrop-blur-xl flex-shrink-0 z-20">
+    <header className="relative h-16 flex items-center justify-between px-4 sm:px-6 border-b border-white/[0.05] bg-zinc-950/60 backdrop-blur-xl flex-shrink-0 z-20">
       {/* Breadcrumbs */}
       <div className="flex items-center gap-2">
         {breadcrumbs.map((crumb, i) => (

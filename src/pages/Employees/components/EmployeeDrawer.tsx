@@ -115,7 +115,7 @@ export function EmployeeDrawer({
             className="fixed right-0 top-0 h-full w-full max-w-[520px] z-50 flex flex-col bg-zinc-950/98 backdrop-blur-2xl border-l border-white/[0.08] shadow-2xl"
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-5 border-b border-white/[0.06] flex-shrink-0">
+            <div className="flex items-center justify-between gap-3 px-4 py-4 sm:px-6 sm:py-5 border-b border-white/[0.06] flex-shrink-0">
               <div>
                 <h2 className="text-lg font-semibold">
                   {mode === 'create' ? 'Add Employee' : 'Edit Employee'}
@@ -133,7 +133,7 @@ export function EmployeeDrawer({
 
             {/* Scrollable form */}
             <div className="flex-1 overflow-y-auto custom-scroll">
-              <form id="employee-form" onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-5">
+              <form id="employee-form" onSubmit={handleSubmit(onSubmit)} className="p-4 sm:p-6 space-y-5">
 
                 {/* ── Basic Info ── */}
                 <SectionTitle>Basic Information</SectionTitle>
@@ -150,7 +150,7 @@ export function EmployeeDrawer({
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       First Name <span className="text-red-400">*</span>
@@ -229,7 +229,7 @@ export function EmployeeDrawer({
                   )}
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       Salary <span className="text-red-400">*</span>
@@ -364,7 +364,7 @@ export function EmployeeDrawer({
                 {/* ── Address ── */}
                 <SectionTitle>Address</SectionTitle>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       House No. <span className="text-red-400">*</span>
@@ -388,7 +388,7 @@ export function EmployeeDrawer({
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       City <span className="text-red-400">*</span>
@@ -411,7 +411,7 @@ export function EmployeeDrawer({
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       Country <span className="text-red-400">*</span>
@@ -438,7 +438,7 @@ export function EmployeeDrawer({
             </div>
 
             {/* Footer */}
-            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-white/[0.06] bg-zinc-950/50 flex-shrink-0">
+            <div className="flex items-center justify-end gap-3 px-4 py-4 sm:px-6 border-t border-white/[0.06] bg-zinc-950/50 flex-shrink-0">
               <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
                 Cancel
               </Button>

@@ -159,7 +159,7 @@ export function EmployeesPage() {
   }
 
   return (
-    <div className="p-6 space-y-5 min-h-full">
+    <div className="p-4 sm:p-6 space-y-5 min-h-full">
 
       {/* ── Header ── */}
       <motion.div
@@ -195,7 +195,7 @@ export function EmployeesPage() {
         className="flex flex-wrap items-center gap-3"
       >
         {/* Search */}
-        <div className="flex-1 min-w-[200px] max-w-xs">
+        <div className="w-full sm:flex-1 sm:min-w-[200px] sm:max-w-xs">
           <Input
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(0) }}
@@ -214,7 +214,7 @@ export function EmployeesPage() {
           value={departmentId}
           onValueChange={(v) => { setDepartmentId(v); setPage(0) }}
         >
-          <SelectTrigger className="w-44 text-xs">
+          <SelectTrigger className="w-full sm:w-44 text-xs">
             <SelectValue placeholder="All Departments" />
           </SelectTrigger>
           <SelectContent>
@@ -232,7 +232,7 @@ export function EmployeesPage() {
           value={statusFilter}
           onValueChange={(v) => { setStatusFilter(v); setPage(0) }}
         >
-          <SelectTrigger className="w-32 text-xs">
+          <SelectTrigger className="w-full sm:w-32 text-xs">
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
