@@ -2,6 +2,7 @@ import { Outlet } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { Header } from '@/components/layout/Header'
+import { MobileNav } from '@/components/layout/MobileNav'
 import { CommandPalette } from '@/components/common/CommandPalette'
 import { ToastContainer } from '@/components/ui/toast'
 
@@ -19,7 +20,7 @@ export function AppLayout() {
       <div className="flex-1 flex flex-col overflow-hidden min-w-0">
         <Header />
 
-        <main className="flex-1 overflow-auto custom-scroll">
+        <main className="flex-1 overflow-auto custom-scroll pb-16 md:pb-0">
           <motion.div
             key={location.pathname}
             initial={{ opacity: 0, y: 8 }}
@@ -34,6 +35,7 @@ export function AppLayout() {
 
       <CommandPalette />
       <ToastContainer />
+      <MobileNav />
     </div>
   )
 }

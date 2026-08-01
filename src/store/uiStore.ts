@@ -11,6 +11,7 @@ interface Toast {
 
 interface UIState {
   sidebarCollapsed: boolean
+  mobileSidebarOpen: boolean
   theme: 'dark' | 'light'
   commandPaletteOpen: boolean
   globalSearch: string
@@ -18,6 +19,8 @@ interface UIState {
   pageLoading: boolean
 
   toggleSidebar: () => void
+  toggleMobileSidebar: () => void
+  closeMobileSidebar: () => void
   setSidebarCollapsed: (collapsed: boolean) => void
   toggleTheme: () => void
   setTheme: (theme: 'dark' | 'light') => void
@@ -33,6 +36,7 @@ export const useUIStore = create<UIState>()(
   persist(
     (set, get) => ({
       sidebarCollapsed: false,
+      mobileSidebarOpen: false,
       theme: 'dark',
       commandPaletteOpen: false,
       globalSearch: '',
@@ -41,6 +45,11 @@ export const useUIStore = create<UIState>()(
 
       toggleSidebar: () =>
         set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
+
+      toggleMobileSidebar: () =>
+        set((state) => ({ mobileSidebarOpen: !state.mobileSidebarOpen })),
+
+      closeMobileSidebar: () => set({ mobileSidebarOpen: false }),
 
       setSidebarCollapsed: (collapsed) =>
         set({ sidebarCollapsed: collapsed }),

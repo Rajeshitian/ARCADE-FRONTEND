@@ -43,13 +43,13 @@ export function DashboardPage() {
   }
 
   return (
-    <div className="p-6 space-y-6 min-h-full">
+    <div className="p-4 sm:p-6 space-y-6 min-h-full">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="flex items-center justify-between"
+        className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between"
       >
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground">

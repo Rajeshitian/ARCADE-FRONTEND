@@ -27,7 +27,7 @@ export function HiringChart({ data }: HiringChartProps) {
   return (
     <Card className="h-full">
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <CardTitle>Monthly Hiring</CardTitle>
             <CardDescription>New hires per month this year</CardDescription>

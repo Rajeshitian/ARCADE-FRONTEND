@@ -13,7 +13,7 @@ import { useAllEmployees } from '@/hooks/useEmployees'
 
 export function Sidebar() {
   const location = useLocation()
-  const { sidebarCollapsed, toggleSidebar } = useUIStore()
+  const { sidebarCollapsed, mobileSidebarOpen, toggleSidebar, closeMobileSidebar } = useUIStore()
   const { user, logout } = useAuthStore()
   const [hoveredItem, setHoveredItem] = useState<string | null>(null)
 
@@ -38,11 +38,25 @@ export function Sidebar() {
     href === '/' ? location.pathname === '/' : location.pathname.startsWith(href)
 
   return (
-    <motion.aside
+    <>
+      {mobileSidebarOpen && (
+        <button
+          type="button"
+          aria-label="Close navigation menu"
+          onClick={closeMobileSidebar}
+          className="fixed inset-0 z-30 bg-black/60 md:hidden"
+        />
+      )}
+      <motion.aside
       initial={false}
-      animate={{ width: sidebarCollapsed ? 64 : 260 }}
+      animate={{ width: mobileSidebarOpen ? 260 : sidebarCollapsed ? 64 : 260 }}
       transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
-      className="relative hidden md:flex flex-col h-full bg-zinc-950/80 backdrop-blur-xl border-r border-white/[0.05] overflow-visible z-30"
+      className={cn(
+        'relative flex-col h-full bg-zinc-950/95 backdrop-blur-xl border-r border-white/[0.05] overflow-visible z-40',
+        mobileSidebarOpen
+          ? 'fixed inset-y-0 left-0 flex w-[260px] md:relative md:flex'
+          : 'hidden md:flex'
+      )}
     >
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute inset-0 bg-gradient-to-b from-blue-950/20 via-transparent to-violet-950/20" />
@@ -88,9 +102,10 @@ export function Sidebar() {
             key={item.href}
             item={item}
             isActive={isActive(item.href)}
-            collapsed={sidebarCollapsed}
+            collapsed={mobileSidebarOpen ? false : sidebarCollapsed}
             hovered={hoveredItem === item.href}
             onHover={setHoveredItem}
+            onNavigate={closeMobileSidebar}
           />
         ))}
         <div className="my-3 mx-2 border-t border-white/[0.05]" />
@@ -99,9 +114,10 @@ export function Sidebar() {
             key={item.href}
             item={item}
             isActive={isActive(item.href)}
-            collapsed={sidebarCollapsed}
+            collapsed={mobileSidebarOpen ? false : sidebarCollapsed}
             hovered={hoveredItem === item.href}
             onHover={setHoveredItem}
+            onNavigate={closeMobileSidebar}
           />
         ))}
       </nav>
@@ -158,7 +174,8 @@ export function Sidebar() {
       >
         {sidebarCollapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-3 w-3" />}
       </motion.button>
-    </motion.aside>
+      </motion.aside>
+    </>
   )
 }
 
@@ -168,13 +185,15 @@ interface NavItemProps {
   collapsed: boolean
   hovered: boolean
   onHover: (href: string | null) => void
+  onNavigate: () => void
 }
 
-function NavItem({ item, isActive, collapsed, hovered, onHover }: NavItemProps) {
+function NavItem({ item, isActive, collapsed, hovered, onHover, onNavigate }: NavItemProps) {
   const Icon = item.icon
   return (
     <Link
       to={item.href}
+      onClick={onNavigate}
       onMouseEnter={() => onHover(item.href)}
       onMouseLeave={() => onHover(null)}
       className={cn(

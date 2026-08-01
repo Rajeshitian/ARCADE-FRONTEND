@@ -5,7 +5,7 @@ import {
   Bell,
   Sun,
   Moon,
-  ChevronRight,
+  ChevronRight, Menu, X,
 } from 'lucide-react'
 import { cn } from '@/utils'
 import { useUIStore } from '@/store/uiStore'
@@ -27,15 +27,25 @@ const routeLabels: Record<string, string[]> = {
 export function Header() {
   const location = useLocation()
   const navigate = useNavigate()
-  const { theme, toggleTheme, openCommandPalette } = useUIStore()
+  const { theme, toggleTheme, openCommandPalette, mobileSidebarOpen, toggleMobileSidebar } = useUIStore()
   const { user } = useAuthStore()
 
   const breadcrumbs = routeLabels[location.pathname] ?? ['Page']
 
   return (
     <header className="relative h-16 flex items-center justify-between px-4 sm:px-6 border-b border-white/[0.05] bg-zinc-950/60 backdrop-blur-xl flex-shrink-0 z-20">
+      <Button
+        variant="ghost"
+        size="icon-sm"
+        onClick={toggleMobileSidebar}
+        aria-label={mobileSidebarOpen ? 'Close navigation menu' : 'Open navigation menu'}
+        className="md:hidden mr-2 text-muted-foreground hover:text-foreground"
+      >
+        {mobileSidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+      </Button>
+
       {/* Breadcrumbs */}
-      <div className="flex items-center gap-2">
+      <div className="flex min-w-0 items-center gap-2">
         {breadcrumbs.map((crumb, i) => (
           <div key={crumb} className="flex items-center gap-2">
             {i > 0 && <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/50" />}

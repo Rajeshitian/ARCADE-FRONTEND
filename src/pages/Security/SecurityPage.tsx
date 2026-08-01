@@ -19,7 +19,7 @@ export function SecurityPage() {
   const [showToken, setShowToken] = useState(false)
 
   return (
-    <div className="p-6 space-y-6 min-h-full">
+    <div className="p-4 sm:p-6 space-y-6 min-h-full">
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
         <div className="flex items-center gap-3">

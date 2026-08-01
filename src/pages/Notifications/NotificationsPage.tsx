@@ -74,7 +74,7 @@ export function NotificationsPage() {
   }
 
   return (
-    <div className="p-6 space-y-5 min-h-full">
+    <div className="p-4 sm:p-6 space-y-5 min-h-full">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
