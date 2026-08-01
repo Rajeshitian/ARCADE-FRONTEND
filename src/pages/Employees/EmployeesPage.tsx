@@ -53,7 +53,7 @@ export function EmployeesPage() {
   const sort: SortInput = { field: sortField, direction: sortDir }
 
   const { data: empData,  loading: empLoading, error: empError } = useAllEmployees(page, PAGE_SIZE, filter, sort)
-  const { data: deptData } = useAllDepartments()
+  const { data: deptData, loading: departmentsLoading, error: departmentsError } = useAllDepartments()
   const { data: projData } = useAllProjects()
   const { data: roleData } = useAllRoles()
 
@@ -359,6 +359,8 @@ export function EmployeesPage() {
         employee={selectedEmployee}
         mode={drawerMode}
         departments={departments}
+        departmentsLoading={departmentsLoading}
+        departmentsError={departmentsError?.message}
         projects={projects}
         roles={roles}
       />

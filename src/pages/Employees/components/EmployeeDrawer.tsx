@@ -21,6 +21,8 @@ interface EmployeeDrawerProps {
   employee?: Employee | null
   mode: 'create' | 'edit'
   departments: Department[]
+  departmentsLoading?: boolean
+  departmentsError?: string
   projects: Project[]
   roles: Role[]
 }
@@ -43,6 +45,7 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
 export function EmployeeDrawer({
   open, onClose, onSave, employee, mode,
   departments, projects, roles,
+  departmentsLoading = false, departmentsError,
 }: EmployeeDrawerProps) {
   const {
     register,
@@ -215,7 +218,15 @@ export function EmployeeDrawer({
                           <SelectValue placeholder="Select department" />
                         </SelectTrigger>
                         <SelectContent>
-                          {departments.length > 0 ? departments.map((d) => (
+                          {departmentsLoading ? (
+                            <SelectItem value="departments-loading" disabled>
+                              Loading departments...
+                            </SelectItem>
+                          ) : departmentsError ? (
+                            <SelectItem value="departments-error" disabled>
+                              Unable to load departments
+                            </SelectItem>
+                          ) : departments.length > 0 ? departments.map((d) => (
                             <SelectItem key={d.id} value={String(d.id)}>
                               {d.departmentName || d.departmentCode}
                             </SelectItem>
@@ -228,6 +239,9 @@ export function EmployeeDrawer({
                       </Select>
                     )}
                   />
+                  {departmentsError && (
+                    <p className="text-xs text-red-400">{departmentsError}</p>
+                  )}
                   {errors.departmentId && (
                     <p className="text-xs text-red-400">{errors.departmentId.message}</p>
                   )}
