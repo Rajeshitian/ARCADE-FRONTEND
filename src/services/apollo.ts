@@ -9,7 +9,9 @@ import { onError } from '@apollo/client/link/error'
 import { RetryLink } from '@apollo/client/link/retry'
 import { useAuthStore } from '@/store/authStore'
 
-const GRAPHQL_URL = `${import.meta.env.VITE_API_URL ?? 'http://localhost:8080'}/graphql`
+const API_URL = import.meta.env.VITE_API_URL ?? (import.meta.env.DEV ? 'http://localhost:8080' : '')
+if (!API_URL) throw new Error('VITE_API_URL must be configured in production')
+const GRAPHQL_URL = `${API_URL}/graphql`
 
 // ─── HTTP Link ────────────────────────────────────────────────────────────────
 const httpLink = createHttpLink({

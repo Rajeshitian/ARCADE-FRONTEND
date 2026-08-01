@@ -17,7 +17,9 @@ const tabs = [
   { id: 'api', label: 'API Keys', icon: Key },
 ]
 
-const GRAPHQL_URL = `${import.meta.env.VITE_API_URL ?? 'http://localhost:8080'}/graphql`
+const API_URL = import.meta.env.VITE_API_URL ?? (import.meta.env.DEV ? 'http://localhost:8080' : '')
+if (!API_URL) throw new Error('VITE_API_URL must be configured in production')
+const GRAPHQL_URL = `${API_URL}/graphql`
 
 export function SettingsPage() {
   const { user } = useAuthStore()

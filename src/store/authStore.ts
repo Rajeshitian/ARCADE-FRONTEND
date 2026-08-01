@@ -25,7 +25,8 @@ interface AuthState {
   setUser: (user: User) => void
 }
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8080'
+const API_URL = import.meta.env.VITE_API_URL ?? (import.meta.env.DEV ? 'http://localhost:8080' : '')
+if (!API_URL) throw new Error('VITE_API_URL must be configured in production')
 const GRAPHQL_URL = `${API_URL}/graphql`
 
 // GraphQL login mutation (matches backend schema: login(input: LoginInput!): AuthPayload!)
