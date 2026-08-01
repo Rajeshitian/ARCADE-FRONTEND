@@ -164,10 +164,15 @@ export function EmployeeTable({
                 <td className="px-3 py-3 w-12">
                   <div className="relative">
                     <Button
+                      type="button"
                       variant="ghost"
                       size="icon-sm"
                       onClick={() => setMenuOpen(menuOpen === emp.id ? null : emp.id)}
-                      className={cn('transition-opacity', hovered === emp.id ? 'opacity-100' : 'opacity-0')}
+                      className={cn(
+                        'transition-opacity opacity-80 hover:opacity-100',
+                        hovered === emp.id && 'opacity-100'
+                      )}
+                      aria-label="Open actions menu"
                     >
                       <MoreHorizontal className="h-4 w-4" />
                     </Button>
@@ -182,6 +187,7 @@ export function EmployeeTable({
                           className="absolute right-0 top-8 z-20 w-40 rounded-xl border border-white/[0.1] bg-zinc-900/95 backdrop-blur-xl shadow-2xl overflow-hidden"
                         >
                           <button
+                            type="button"
                             onClick={() => { onEdit(emp); setMenuOpen(null) }}
                             className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-foreground/80 hover:text-foreground hover:bg-white/[0.06] transition-colors"
                           >
@@ -189,6 +195,7 @@ export function EmployeeTable({
                           </button>
                           <div className="h-px bg-white/[0.05] mx-1" />
                           <button
+                            type="button"
                             onClick={() => { onDelete(emp); setMenuOpen(null) }}
                             className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-red-400 hover:bg-red-500/10 transition-colors"
                           >
