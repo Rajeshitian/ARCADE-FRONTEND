@@ -212,9 +212,10 @@ export function NotificationsPage() {
                   </div>
 
                   {/* Actions */}
-                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 mt-0.5">
+                  <div className="flex items-center gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity flex-shrink-0 mt-0.5">
                     {!isRead && (
                       <Button
+                        type="button"
                         variant="ghost"
                         size="icon-sm"
                         className="h-7 w-7 text-muted-foreground hover:text-blue-400"
@@ -225,6 +226,7 @@ export function NotificationsPage() {
                       </Button>
                     )}
                     <Button
+                      type="button"
                       variant="ghost"
                       size="icon-sm"
                       className="h-7 w-7 text-muted-foreground hover:text-red-400"

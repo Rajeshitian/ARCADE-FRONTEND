@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   ChevronUp, ChevronDown, ChevronsUpDown,
@@ -47,6 +47,17 @@ export function EmployeeTable({
 }: EmployeeTableProps) {
   const [hovered, setHovered] = useState<string | null>(null)
   const [menuOpen, setMenuOpen] = useState<string | null>(null)
+
+  useEffect(() => {
+    const handleDocumentClick = (event: MouseEvent) => {
+      if (!(event.target instanceof HTMLElement)) return
+      if (event.target.closest('[data-row-menu]')) return
+      setMenuOpen(null)
+    }
+
+    document.addEventListener('mousedown', handleDocumentClick)
+    return () => document.removeEventListener('mousedown', handleDocumentClick)
+  }, [])
 
   const SortIcon = ({ field }: { field: string }) => {
     if (sortField !== field) return <ChevronsUpDown className="h-3.5 w-3.5 opacity-30" />
@@ -99,7 +110,7 @@ export function EmployeeTable({
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ delay: i * 0.03, duration: 0.2 }}
                 onMouseEnter={() => setHovered(emp.id)}
-                onMouseLeave={() => { setHovered(null); setMenuOpen(null) }}
+                onMouseLeave={() => setHovered(null)}
                 className={cn(
                   'border-b border-white/[0.04] transition-colors duration-150',
                   hovered === emp.id && 'bg-white/[0.03]',
@@ -180,11 +191,12 @@ export function EmployeeTable({
                     <AnimatePresence>
                       {menuOpen === emp.id && (
                         <motion.div
+                          data-row-menu
                           initial={{ opacity: 0, scale: 0.9, y: -5 }}
                           animate={{ opacity: 1, scale: 1, y: 0 }}
                           exit={{ opacity: 0, scale: 0.9, y: -5 }}
                           transition={{ duration: 0.15 }}
-                          className="absolute right-0 top-8 z-20 w-40 rounded-xl border border-white/[0.1] bg-zinc-900/95 backdrop-blur-xl shadow-2xl overflow-hidden"
+                          className="absolute right-0 top-full mt-1 z-20 w-40 rounded-xl border border-white/[0.1] bg-zinc-900/95 backdrop-blur-xl shadow-2xl overflow-hidden"
                         >
                           <button
                             type="button"
